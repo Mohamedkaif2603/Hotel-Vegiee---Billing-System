@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HOTEL VEGIEE</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <h1>HOTEL VEGIEE</h1>
+            <nav class="tabs" role="tablist">
+                <button class="tab active" data-tab="menu" aria-selected="true">Menu</button>
+                <button class="tab" data-tab="billing" aria-selected="false">Cart & Billing</button>
+                <button class="tab" data-tab="manage" aria-selected="false">Manage Menu</button>
+                <button class="tab" data-tab="reports" aria-selected="false">Reports</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Menu -->
+        <section id="tab-menu" class="tab-panel active" role="tabpanel" aria-labelledby="menu">
+            <div class="panel-header">
+                <h2>Menu</h2>
+                <div class="search-row">
+                    <input type="text" id="menuSearch" placeholder="Search menu..." />
+                </div>
+            </div>
+            <div id="menuGrid" class="grid"></div>
+        </section>
+
+        <!-- Billing / Cart -->
+        <section id="tab-billing" class="tab-panel" role="tabpanel" aria-labelledby="billing">
+            <div class="panel-header">
+                <h2>Cart & Billing</h2>
+                <div class="actions-row">
+                    <button id="clearCartBtn" class="btn btn-secondary">Clear Cart</button>
+                </div>
+            </div>
+
+            <div class="billing-layout">
+                <div class="cart">
+                    <table class="cart-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Price</th>
+                                <th>Qty</th>
+                                <th>Subtotal</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cartBody"></tbody>
+                        <tbody>
+                            <tr id="cartEmpty" class="muted"><td colspan="5">Cart is empty</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <aside class="bill">
+                    <div class="bill-row"><span>Subtotal</span><span id="subtotal">₹0.00</span></div>
+                    <div class="bill-row total"><span>Total</span><span id="total">₹0.00</span></div>
+                    <label class="field">
+                        <span>Customer Name (optional)</span>
+                        <input type="text" id="customerName" placeholder="Enter name" />
+                    </label>
+                    <div class="pay-actions">
+                        <button id="payNowBtn" class="btn btn-primary">Pay Now</button>
+                        <button id="printBillBtn" class="btn btn-outline">Print Bill</button>
+                    </div>
+                    <div id="qrWrap" class="qr-wrap hidden">
+                        <h3>Scan to Pay</h3>
+                        <img id="qrImage" alt="QR Code" />
+                        <p class="muted">After successful payment, click "Pay Now" again to record the sale.</p>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- Manage Menu -->
+        <section id="tab-manage" class="tab-panel" role="tabpanel" aria-labelledby="manage">
+            <div class="panel-header">
+                <h2>Manage Menu</h2>
+            </div>
+            <form id="menuForm" class="card form">
+                <div class="form-grid">
+                    <label class="field">
+                        <span>Item Name</span>
+                        <input type="text" id="itemName" required placeholder="e.g., Idly" />
+                    </label>
+                    <label class="field">
+                        <span>Price (₹)</span>
+                        <input type="number" id="itemPrice" required min="0" step="0.01" placeholder="e.g., 10" />
+                    </label>
+                    <label class="field">
+                        <span>Image URL (optional)</span>
+                        <input type="url" id="itemImage" placeholder="https://..." />
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <input type="hidden" id="editingId" />
+                    <button type="submit" class="btn btn-primary" id="saveItemBtn">Add Item</button>
+                    <button type="button" class="btn btn-secondary hidden" id="cancelEditBtn">Cancel Edit</button>
+                </div>
+            </form>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="menu-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Image</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manageTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reports -->
+        <section id="tab-reports" class="tab-panel" role="tabpanel" aria-labelledby="reports">
+            <div class="panel-header">
+                <h2>Monthly Sales Report</h2>
+                <div class="report-controls">
+                    <label class="field">
+                        <span>Month</span>
+                        <input type="month" id="reportMonth" />
+                    </label>
+                    <button id="exportCsvBtn" class="btn btn-outline">Export CSV</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Date/Time</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Total (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportBody"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="right">Monthly Total</td>
+                                <td id="reportTotal">₹0.00</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <template id="billTemplate">
+        <div class="print-bill">
+            <h2>HOTEL BISMI</h2>
+            <p class="muted">Thank you for dining with us!</p>
+            <div class="bill-meta">
+                <div><strong>Customer:</strong> <span data-bill="customer"></span></div>
+                <div><strong>Date:</strong> <span data-bill="date"></span></div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody data-bill="items"></tbody>
+                <tfoot>
+                    <tr><td colspan="3" class="right">Subtotal</td><td data-bill="subtotal"></td></tr>
+                    <tr><td colspan="3" class="right"><strong>Total</strong></td><td data-bill="total"></td></tr>
+                </tfoot>
+            </table>
+        </div>
+    </template>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
+
